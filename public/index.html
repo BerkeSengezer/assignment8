@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Development Programme</title>
+  </head>
+  <body>
+    <header>
+      <div class="page-width">
+        <p class="eyebrow">Study programme · Fall 2026</p>
+        <h1>Web Development</h1>
+        <p>Learn how the web works, one request at a time.</p>
+      </div>
+    </header>
+
+    <main class="page-width">
+      <section class="introduction" aria-labelledby="about-title">
+        <h2 id="about-title">About the programme</h2>
+        <p>This fictional programme brings together web programming, programming fundamentals and interface design. Students practise building simple, accessible pages and connecting them to a server.</p>
+        <p>This information server lets you explore the courses and try different HTTP responses. Use the buttons below to see the status code and response body for each API request.</p>
+        <nav aria-label="Other server routes">
+          <a href="/hello">Say hello</a>
+          <a href="/robots.txt">Read robots.txt</a>
+          <a href="/old-page">Try a redirect</a>
+        </nav>
+      </section>
+
+      <section aria-labelledby="api-title">
+        <h2 id="api-title">Try the API</h2>
+        <p>Some routes return an error on purpose. A 403 or 404 response is an expected result for those examples.</p>
+        <div class="route-buttons">
+          <button type="button" data-path="/api/courses">Courses <span>GET /api/courses</span></button>
+          <button type="button" data-path="/api/status">Server status <span>GET /api/status</span></button>
+          <button type="button" data-path="/api/headers">Request headers <span>GET /api/headers</span></button>
+          <button type="button" data-path="/api/subscribe" data-method="POST">Subscribe <span>POST /api/subscribe</span></button>
+          <button type="button" data-path="/api/admin">Admin access <span>GET /api/admin · 403</span></button>
+          <button type="button" data-path="/api/stats">Request count <span>GET /api/stats</span></button>
+          <button type="button" data-path="/api/missing">Missing route <span>GET /api/missing · 404</span></button>
+        </div>
+      </section>
+
+      <section class="response-panel" aria-labelledby="response-title">
+        <h2 id="response-title">Response</h2>
+        <div aria-live="polite" aria-atomic="true">
+          <p id="request-info">Choose a route to send a request.</p>
+          <p id="response-status">Status: waiting</p>
+          <pre id="response-body">The response body will appear here.</pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-width">
+      <p>Berke Sengezer · Web Programming · Assignment 8</p>
+    </footer>
+  </body>
+</html>
