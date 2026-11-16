@@ -9,6 +9,13 @@ const courses = [
   { id: 'DSN101', title: 'Interface Design', credits: 4 },
 ];
 
+function requestLogger(req, res, next) {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
+  next();
+}
+
+app.use(requestLogger);
+
 app.get('/hello', (req, res) => {
   res.type('text/plain').send("Hello from Berke's server");
 });
