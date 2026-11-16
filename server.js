@@ -40,6 +40,23 @@ app.get('/api/headers', (req, res) => {
   });
 });
 
+app.post('/api/subscribe', (req, res) => {
+  res.status(201).json({ subscribed: true });
+});
+
+app.get('/api/admin', (req, res) => {
+  res.status(403).json({ error: 'Forbidden' });
+});
+
+// Keep this after all routes so that it only handles unmatched requests.
+app.use((req, res) => {
+  if (req.path.startsWith('/api')) {
+    res.status(404).json({ error: 'Not found' });
+  } else {
+    res.status(404).type('text/plain').send('Page not found');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Study programme server running at http://localhost:${port}`);
 });
