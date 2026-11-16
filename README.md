@@ -183,3 +183,41 @@ Page not found
 - A fresh server was started from a different working directory on port 3002. The page, CSS and JavaScript still loaded.
 - The request counter increased for static files and missing routes as well as successful API requests.
 - A clean `npm ci` completed using the committed lockfile.
+
+## Reasoning questions
+
+### 1. Route order
+
+In a temporary copy of the server, the 404 fallback was moved above the static middleware and routes. Both `/api/courses` and `/` then returned 404, even though they worked before the change. Express runs handlers in registration order, and this fallback sends a response instead of passing control to the later handlers.
+
+### 2. Middleware
+
+In another temporary copy, `next()` was removed from the logger. Clicking Courses left the page showing “Status: loading...” and “Waiting for the server...”, while the terminal still printed the timestamp, method and URL. A curl request with `--max-time 2` timed out with zero bytes received because the logger neither sent a response nor let the route run. The normal logger was restored after the experiment.
+
+### 3. Status codes
+
+`201 Created` tells the client that the POST request has created a subscription, whereas `200 OK` only reports a general success. A missing page should return 404 because the requested resource was not found. Returning 200 with an error message would make tools and clients treat that missing resource as a successful request.
+
+### 4. Configuration
+
+`process.env.PORT` lets the person or hosting service running the server choose the port without editing the code. It also allows more than one local server to run without all of them trying to use port 3000. The fallback keeps the project easy to start when no port has been configured.
+
+### 5. Dependencies
+
+`node_modules` contains installed packages and can be recreated, so committing it would add many unnecessary files. After cloning, a teammate should enter the project folder, run `npm ci`, then `npm start`. The committed `package-lock.json` lets npm install the dependency versions recorded for this project.
+
+### 6. Same origin
+
+When the page is served by Express, `/api/courses` uses the same scheme, host and port as the page. If the HTML is opened from disk, that relative URL points to the file scheme instead of this HTTP server. Even changing it to an absolute HTTP URL would create an origin difference, subject to the browser's same-origin policy and CORS rules. Opening the page through the server avoids that problem here.
+
+## Self-study notes
+
+- **Process information:** The [Node process documentation](https://nodejs.org/api/process.html#processuptime) describes `process.uptime()` as elapsed process time in seconds, including fractions. `process.version` supplies the running Node version, so `/api/status` reads both directly instead of using fixed example values.
+- **Content types:** The [Express response documentation](https://expressjs.com/en/5x/api/response/#restype) explains `res.type()`. The text routes use `res.type('text/plain').send(...)`; API routes use `res.json(...)` to send JSON with its matching content type.
+- **Readable JSON:** The [JSON.stringify documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify) explains the indentation argument. `JSON.stringify(data, null, 2)` formats the response with two spaces before displaying it in the `pre` element.
+- **Static directory:** The [Express static files guide](https://expressjs.com/en/starter/static-files/) warns that a relative static directory depends on the launch directory. The [Node URL documentation](https://nodejs.org/api/url.html#urlfileurltopathurl-options) helped resolve `./public/` relative to the server module and convert it to a filesystem path.
+- **Fetch errors:** The [Fetch guide](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) explains that an HTTP error such as 404 does not reject the fetch promise. The page therefore displays `response.status` and the body for HTTP errors, and uses `catch` for failures such as an unreachable server.
+
+## Challenges
+
+The static directory needed care because a simple relative `public` path depends on where Node is started. Resolving it from the module URL fixed that, and starting from a different folder confirmed it. Another detail was separating HTTP errors from connection failures in the page: both should be visible, and the buttons should become usable again after the request finishes.
